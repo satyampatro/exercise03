@@ -19,7 +19,7 @@ let config = {
     max: process.env.postgres_db_pool_size
 }
 
-async function setUpPostgres() {
+exports.setUpPostgres = async function () {
     global.pgInstance = null;
 
     let pool = new pg.Pool(config)
@@ -29,8 +29,6 @@ async function setUpPostgres() {
         console.error('Postgres pool has drained.');
     });
 }
-setUpPostgres().catch((e) => { console.error(e); process.exit(0); })
-
 
 exports.checkDbConnectivity = function () {
     if (pgInstance != null && !pgInstance._connected) {

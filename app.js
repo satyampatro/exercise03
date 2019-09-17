@@ -7,7 +7,11 @@ const app = express();
 const bodyParser = require("body-parser");
 
 // Initialize postgres db
-let dbUtils = require('./util/db')
+let dbUtils = require('./util/db');
+dbUtils.setUpPostgres().catch((e) => {
+    console.error(e);
+    process.exit(1);
+})
 
 app.use(bodyParser.json({ limit: '15Mb' }));
 app.use(bodyParser.urlencoded({
@@ -27,11 +31,19 @@ let CronJob = require('cron').CronJob;
 let filmLocationModule = require('./modules/film_location');
 // runs every day to check and update new film locations
 new CronJob('00 00 00 * * *', function () {
-    filmLocationModule.updateFilmLocations();
+    filmLocationModule.updateFilmLocations()
+        .catch((e) => {
+            console.error(e);
+            process.exit(1);
+        })
 }, null, true, 'Asia/Kolkata');
 
-filmLocationModule.updateFilmLocations();
-
+setTimeout(function () {
+    filmLocationModule.updateFilmLocations()
+        .catch((e) => {
+            console.error(e);
+        })
+}, 3000)
 
 // Add Routes
 app.use('/', require('./routes'));
@@ -39,9 +51,3 @@ app.use('/', require('./routes'));
 // server init
 app.listen(port);
 console.log(`App listening on port ${port}`);
-
-app.use(function (err, req, res, next) {
-    if (err) {
-        console.error('Uhnandled exception', err);
-    }
-});
