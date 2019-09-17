@@ -36,6 +36,25 @@ exports.fetchFilmLocations = async function (queryString, longitude, latitude) {
     return result;
 }
 
+exports.fetchFilmSuggestions = async function (queryString) {
+    // build where caluse
+    let whereCaluse = `WHERE title `;
+    let valueList = [];
+    if (queryString) {
+        whereCaluse += ` ilike $1`;
+        valueList.push(queryString + "%");
+    } else {
+        whereCaluse += `IS NOT NULL`;
+    }
+
+    // fetch data
+    let query = `SELECT distinct title as value FROM movies ${whereCaluse} \
+      ORDER BY value LIMIT 100`;
+    console.debug(query)
+    let result = (await pgInstance.query(query, valueList)).rows;
+    return result;
+}
+
 exports.updateFilmLocations = async function (offset) {
     // on every next run of cron
     // first fetch the total count of stored entries
