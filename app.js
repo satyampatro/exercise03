@@ -38,13 +38,6 @@ new CronJob('00 00 00 * * *', function () {
         })
 }, null, true, 'Asia/Kolkata');
 
-setTimeout(function () {
-    filmLocationModule.updateFilmLocations()
-        .catch((e) => {
-            console.error(e);
-        })
-}, 3000)
-
 // Add Routes
 app.use('/', require('./routes'));
 
